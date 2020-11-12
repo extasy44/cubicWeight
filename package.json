@@ -7,7 +7,7 @@
     "dev": "node index.js",
     "test": "jest --watch *.js"
   },
-  "author": "",
+  "author": "Heejun Seo",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.0"
