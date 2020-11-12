@@ -1,0 +1,18 @@
+{
+  "name": "cubic-weight",
+  "version": "1.0.0",
+  "description": "Find the average cubic weight for all products from a retrieved category",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "test": "jest --watch *.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
