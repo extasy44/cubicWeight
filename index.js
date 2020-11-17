@@ -2,27 +2,32 @@ const axios = require('axios');
 
 const args = process.argv.slice(2);
 
-const PRODUCT_API_URL =
-  args[0] ||
-  'http://wp8m3he1wt.s3-website-ap-southeast-2.amazonaws.com/api/products/1';
-
-const categoryToSelect = args[1] || 'Air Conditioners';
+const PRODUCT_API_BASE_URL =
+  'http://wp8m3he1wt.s3-website-ap-southeast-2.amazonaws.com';
+const categoryToSelect = args[0] || 'Air Conditioners';
+const categoryProducts = [];
 
 /**
- * Fetch products data from the end Point then return products in the category
+ * Fetch products data from API recursively then push the filtered products to array
  * @function
- * @param {string} url - The API end point, {string} category - Category to filter
- * @returns {array} - Filtered products by category.
+ * @param {string} page - Page of the API URL,
+ * @param {string} category - Category to filter
  */
-const listProductsByCategory = async (url, category) => {
+const listProductsByCategory = async (page, category) => {
+  const url = PRODUCT_API_BASE_URL + page;
   const response = await axios.get(url);
 
   if (response.status === 200) {
-    return response.data.objects.filter(
+    const results = response.data.objects.filter(
       (product) => product.category === category
     );
+    categoryProducts.push(...results);
+    if (response.data.next !== null) {
+      await listProductsByCategory(response.data.next, category);
+    }
+  } else {
+    throw new Error(response.status);
   }
-  throw new Error(response.status);
 };
 
 /**
@@ -55,22 +60,27 @@ const convertToCubicWeight = ({ width, length, height }) => {
 };
 
 // Excute the function to get the average cubic weight
-listProductsByCategory(PRODUCT_API_URL, categoryToSelect)
-  .then((results) => {
-    if (results && results.length > 0) {
-      const averageCubicWeight = getAverageCubicWeight(results);
-      console.log(
-        `Average Cubic Weight in ${categoryToSelect}`,
-        Math.round(averageCubicWeight * 100) / 100 //rounded to 2 decimal places
-      );
-    } else {
-      console.log(`There is no product in ${categoryToSelect}`);
-    }
-  })
-  .catch((e) => console.log('There has been a problem ', e.message));
+const printAverage = () => {
+  listProductsByCategory('/api/products/1', categoryToSelect)
+    .then(() => {
+      if (categoryProducts.length > 0) {
+        const averageCubicWeight = getAverageCubicWeight(categoryProducts);
+        console.log(
+          `Average Cubic Weight in ${categoryToSelect}`,
+          Math.round(averageCubicWeight * 100) / 100 //rounded to 2 decimal places
+        );
+      } else {
+        console.log(`There is no product in ${categoryToSelect}`);
+      }
+    })
+    .catch((e) => console.log('There has been a problem :', e.message));
+};
+
+printAverage();
 
 module.exports = {
   listProductsByCategory,
   getAverageCubicWeight,
   convertToCubicWeight,
+  categoryProducts,
 };

@@ -49,7 +49,7 @@ node index.js
 ```
 
 ```sh
-node index.js 'API_URL' 'Category'
+node index.js 'Category'
 ```
 
 This will display the average cubic weight of all products in the "Air Conditioners" category or entered category in the response from the API end point.

@@ -2,10 +2,8 @@ const {
   listProductsByCategory,
   getAverageCubicWeight,
   convertToCubicWeight,
+  categoryProducts,
 } = require('./');
-
-const url =
-  'http://wp8m3he1wt.s3-website-ap-southeast-2.amazonaws.com/api/products/1';
 
 sampleProductsData = [
   {
@@ -31,22 +29,17 @@ afterEach(() => {
   console.error.mockRestore();
 });
 
-test('Should returns correct products with the existing category', async () => {
-  const result = await listProductsByCategory(url, 'Air Conditioners');
-  expect(result.length).toEqual(2);
-  expect(result[0].title).toEqual(
-    'Window Seal for Portable Air Conditioner Outlets'
-  );
-});
+describe('fetchData', () => {
+  test('fetches successfully data from an API', async () => {
+    const result = await listProductsByCategory('/api/products/1', 'Batteries');
+    await expect(categoryProducts.length).toBe(5);
+  });
 
-test('Should returns no product with non-existing category', async () => {
-  const result = await listProductsByCategory(url, 'non-existing category');
-  expect(result.length).toEqual(0);
-});
-
-test('Should throw an error with wrong API URL', async () => {
-  const result = listProductsByCategory('http://random.url', 'random category');
-  await expect(result).rejects.toThrow();
+  test('fetches erroneously data from an API', async () => {
+    await expect(
+      listProductsByCategory('/api/productss/1', 'Air Conditioners')
+    ).rejects.toThrow();
+  });
 });
 
 test('Should returns the correct cubic weight', () => {
